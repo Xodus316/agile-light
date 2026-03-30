@@ -54,7 +54,7 @@ function DraggableCard({ task, onEdit }) {
 }
 
 // Droppable column wrapper
-function DroppableColumn({ status, children, isOver }) {
+function DroppableColumn({ status, count, children, isOver }) {
   const { setNodeRef } = useDroppable({ id: status })
   const config = statusConfig[status]
 
@@ -64,9 +64,7 @@ function DroppableColumn({ status, children, isOver }) {
         <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${config.color}`}>
           {config.label}
         </span>
-        <span className="text-xs text-slate-400 font-medium">
-          {/* count passed via children wrapper */}
-        </span>
+        <span className="text-xs text-slate-400 font-medium">{count}</span>
       </div>
       <div
         ref={setNodeRef}
@@ -340,13 +338,7 @@ export default function SprintBoard() {
             const config = statusConfig[status]
             const columnTasks = getFilteredTasks(status)
             return (
-              <DroppableColumn key={status} status={status} isOver={overId === status}>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${config.color}`}>
-                    {config.label}
-                  </span>
-                  <span className="text-xs text-slate-400">{columnTasks.length}</span>
-                </div>
+              <DroppableColumn key={status} status={status} count={columnTasks.length} isOver={overId === status}>
                 {columnTasks.map((task) => (
                   <DraggableCard
                     key={task.id}

@@ -244,6 +244,49 @@ export default function SprintBoard() {
         </div>
       )}
 
+      {/* Sprint progress bar */}
+      {(() => {
+        const total = tasks.length
+        const done = tasks.filter((t) => t.status === 'done').length
+        const pct = total === 0 ? 0 : Math.round((done / total) * 100)
+
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        let daysLabel = null
+        if (sprint.end_date) {
+          const end = new Date(sprint.end_date)
+          end.setHours(0, 0, 0, 0)
+          const diff = Math.ceil((end - today) / (1000 * 60 * 60 * 24))
+          if (diff < 0) daysLabel = { text: `${Math.abs(diff)} day${Math.abs(diff) !== 1 ? 's' : ''} overdue`, overdue: true }
+          else if (diff === 0) daysLabel = { text: 'Due today', overdue: false }
+          else daysLabel = { text: `${diff} day${diff !== 1 ? 's' : ''} to go`, overdue: false }
+        }
+
+        return (
+          <div className="mb-4 bg-white rounded-xl border border-slate-200 px-5 py-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-slate-700">{pct}% complete</span>
+                <span className="text-xs text-slate-400">{done} of {total} task{total !== 1 ? 's' : ''} done</span>
+              </div>
+              {daysLabel && (
+                <span className={`text-sm font-medium ${daysLabel.overdue ? 'text-red-500' : 'text-slate-500'}`}>
+                  {daysLabel.text}
+                </span>
+              )}
+            </div>
+            <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+              <div
+                className={`h-2.5 rounded-full transition-all duration-500 ${
+                  pct === 100 ? 'bg-green-500' : pct >= 50 ? 'bg-blue-500' : 'bg-blue-400'
+                }`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-5 bg-white rounded-xl border border-slate-200 px-4 py-3">
         <span className="text-sm font-medium text-slate-600">Filter:</span>

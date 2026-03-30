@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import auth, teams, projects, sprints, tasks
 
-app = FastAPI(title="Jira Lite API", version="1.0.0")
+app = FastAPI(title="Agile API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,

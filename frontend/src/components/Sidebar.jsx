@@ -50,9 +50,9 @@ export default function Sidebar() {
       <div className="p-4 border-b border-slate-700">
         <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-white text-sm">
-            JL
+            A
           </div>
-          <span className="font-semibold text-lg">Jira Lite</span>
+          <span className="font-semibold text-lg">Agile</span>
         </Link>
       </div>
 

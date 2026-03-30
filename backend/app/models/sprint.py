@@ -35,3 +35,6 @@ class Sprint(Base):
     tasks: Mapped[list["Task"]] = relationship(  # noqa: F821
         "Task", back_populates="sprint"
     )
+    retrospective: Mapped["SprintRetrospective | None"] = relationship(  # noqa: F821
+        "SprintRetrospective", back_populates="sprint", uselist=False
+    )

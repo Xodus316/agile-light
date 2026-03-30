@@ -217,6 +217,14 @@ export default function SprintBoard() {
           <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${sprintStatus.classes}`}>
             {sprintStatus.label}
           </span>
+          {sprint.status === 'completed' && (
+            <Link
+              to={`/sprints/${sprintId}/retrospective`}
+              className="text-sm text-violet-600 hover:text-violet-700 font-medium px-3 py-1.5 rounded-lg hover:bg-violet-50 transition-colors border border-violet-200"
+            >
+              View Retrospective
+            </Link>
+          )}
         </div>
         {(sprint.start_date || sprint.end_date || sprint.goal) && (
           <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-slate-500">

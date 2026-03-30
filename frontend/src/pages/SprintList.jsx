@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getTeam } from '../api/teams.js'
-import { listSprints, createSprint, startSprint, completeSprint, deleteSprint } from '../api/sprints.js'
+import { listSprints, createSprint, startSprint, completeSprint, deleteSprint, reopenSprint } from '../api/sprints.js'
 
 const sprintStatusConfig = {
   planned: { label: 'Planned', classes: 'bg-gray-100 text-gray-600' },
@@ -83,6 +83,15 @@ export default function SprintList() {
       setSprints((prev) => prev.map((s) => (s.id === sprintId ? updated : s)))
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to complete sprint')
+    }
+  }
+
+  async function handleReopenSprint(sprintId) {
+    try {
+      const updated = await reopenSprint(sprintId)
+      setSprints((prev) => prev.map((s) => (s.id === sprintId ? updated : s)))
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to reopen sprint')
     }
   }
 
@@ -265,6 +274,25 @@ export default function SprintList() {
                       >
                         Complete Sprint
                       </button>
+                    )}
+
+                    {sprint.status === 'completed' && (
+                      <>
+                        <Link
+                          to={`/sprints/${sprint.id}/retrospective`}
+                          className="text-sm text-violet-600 hover:text-violet-700 font-medium px-3 py-1.5 rounded-lg hover:bg-violet-50 transition-colors"
+                        >
+                          Retrospective
+                        </Link>
+                        <button
+                          onClick={() => handleReopenSprint(sprint.id)}
+                          disabled={hasActiveSprint}
+                          title={hasActiveSprint ? 'Another sprint is already active' : undefined}
+                          className="text-sm border border-slate-300 text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Re-open
+                        </button>
+                      </>
                     )}
 
                     {sprint.status !== 'active' && (

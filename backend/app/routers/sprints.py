@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
@@ -7,8 +9,10 @@ from app.models.user import User
 from app.models.team import TeamMember
 from app.models.sprint import Sprint, SprintStatus
 from app.models.task import Task
+from app.models.retrospective import SprintRetrospective
 from app.core.deps import get_current_user
 from app.schemas.sprint import SprintCreate, SprintUpdate, SprintResponse
+from app.schemas.retrospective import RetrospectiveUpsert, RetrospectiveResponse
 
 router = APIRouter(prefix="/api/sprints", tags=["sprints"])
 
@@ -192,3 +196,91 @@ async def complete_sprint(
     await db.commit()
     await db.refresh(sprint)
     return await build_sprint_response(sprint, db)
+
+
+@router.post("/{sprint_id}/reopen", response_model=SprintResponse)
+async def reopen_sprint(
+    sprint_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(Sprint).where(Sprint.id == sprint_id))
+    sprint = result.scalar_one_or_none()
+    if not sprint:
+        raise HTTPException(status_code=404, detail="Sprint not found")
+
+    await verify_team_membership(sprint.team_id, current_user.id, db)
+
+    if sprint.status != SprintStatus.completed:
+        raise HTTPException(status_code=400, detail="Only completed sprints can be reopened")
+
+    active_result = await db.execute(
+        select(Sprint).where(
+            Sprint.team_id == sprint.team_id,
+            Sprint.status == SprintStatus.active,
+        )
+    )
+    if active_result.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Another sprint is already active for this team")
+
+    sprint.status = SprintStatus.active
+    await db.commit()
+    await db.refresh(sprint)
+    return await build_sprint_response(sprint, db)
+
+
+@router.get("/{sprint_id}/retrospective", response_model=RetrospectiveResponse | None)
+async def get_retrospective(
+    sprint_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(Sprint).where(Sprint.id == sprint_id))
+    sprint = result.scalar_one_or_none()
+    if not sprint:
+        raise HTTPException(status_code=404, detail="Sprint not found")
+
+    await verify_team_membership(sprint.team_id, current_user.id, db)
+
+    retro_result = await db.execute(
+        select(SprintRetrospective).where(SprintRetrospective.sprint_id == sprint_id)
+    )
+    return retro_result.scalar_one_or_none()
+
+
+@router.put("/{sprint_id}/retrospective", response_model=RetrospectiveResponse)
+async def save_retrospective(
+    sprint_id: int,
+    data: RetrospectiveUpsert,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(Sprint).where(Sprint.id == sprint_id))
+    sprint = result.scalar_one_or_none()
+    if not sprint:
+        raise HTTPException(status_code=404, detail="Sprint not found")
+
+    await verify_team_membership(sprint.team_id, current_user.id, db)
+
+    retro_result = await db.execute(
+        select(SprintRetrospective).where(SprintRetrospective.sprint_id == sprint_id)
+    )
+    retro = retro_result.scalar_one_or_none()
+
+    if retro:
+        retro.went_well = data.went_well
+        retro.improvements = data.improvements
+        retro.action_items = data.action_items
+        retro.updated_at = datetime.now(timezone.utc)
+    else:
+        retro = SprintRetrospective(
+            sprint_id=sprint_id,
+            went_well=data.went_well,
+            improvements=data.improvements,
+            action_items=data.action_items,
+        )
+        db.add(retro)
+
+    await db.commit()
+    await db.refresh(retro)
+    return retro

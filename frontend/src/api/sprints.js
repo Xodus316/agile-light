@@ -19,3 +19,12 @@ export const startSprint = (sprintId) =>
 
 export const completeSprint = (sprintId) =>
   client.post(`/sprints/${sprintId}/complete`).then((r) => r.data)
+
+export const reopenSprint = (sprintId) =>
+  client.post(`/sprints/${sprintId}/reopen`).then((r) => r.data)
+
+export const getRetrospective = (sprintId) =>
+  client.get(`/sprints/${sprintId}/retrospective`).then((r) => r.data)
+
+export const saveRetrospective = (sprintId, data) =>
+  client.put(`/sprints/${sprintId}/retrospective`, data).then((r) => r.data)

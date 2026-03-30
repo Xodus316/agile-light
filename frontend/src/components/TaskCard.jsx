@@ -7,6 +7,8 @@ const priorityConfig = {
 const statusConfig = {
   todo: { label: 'To Do', classes: 'bg-gray-100 text-gray-600' },
   in_progress: { label: 'In Progress', classes: 'bg-blue-100 text-blue-700' },
+  testing: { label: 'Testing', classes: 'bg-violet-100 text-violet-700' },
+  ready_for_production: { label: 'Ready for Prod', classes: 'bg-amber-100 text-amber-700' },
   done: { label: 'Done', classes: 'bg-green-100 text-green-700' },
 }
 
@@ -16,6 +18,10 @@ export default function TaskCard({ task, onClick }) {
 
   const isOverdue =
     task.due_date && new Date(task.due_date) < new Date() && task.status !== 'done'
+
+  const estimateLabel = task.estimate != null
+    ? `${task.estimate}${task.estimate_unit === 'hours' ? 'h' : 'd'}`
+    : null
 
   return (
     <div
@@ -28,6 +34,11 @@ export default function TaskCard({ task, onClick }) {
         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${priority.classes}`}>
           {priority.label}
         </span>
+        {estimateLabel && (
+          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-slate-100 text-slate-500">
+            {estimateLabel}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center justify-between text-xs text-slate-500">

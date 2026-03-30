@@ -8,6 +8,7 @@ import TeamPage from './pages/TeamPage.jsx'
 import ProjectBacklog from './pages/ProjectBacklog.jsx'
 import SprintBoard from './pages/SprintBoard.jsx'
 import SprintList from './pages/SprintList.jsx'
+import TeamBacklog from './pages/TeamBacklog.jsx'
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="teams/:teamId" element={<TeamPage />} />
           <Route path="teams/:teamId/sprints" element={<SprintList />} />
+          <Route path="teams/:teamId/backlog" element={<TeamBacklog />} />
           <Route path="projects/:projectId" element={<ProjectBacklog />} />
           <Route path="sprints/:sprintId" element={<SprintBoard />} />
         </Route>

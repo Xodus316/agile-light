@@ -9,6 +9,8 @@ import TaskModal from '../components/TaskModal.jsx'
 const statusConfig = {
   todo: { label: 'To Do', color: 'bg-gray-100 text-gray-600' },
   in_progress: { label: 'In Progress', color: 'bg-blue-100 text-blue-700' },
+  testing: { label: 'Testing', color: 'bg-violet-100 text-violet-700' },
+  ready_for_production: { label: 'Ready for Prod', color: 'bg-amber-100 text-amber-700' },
   done: { label: 'Done', color: 'bg-green-100 text-green-700' },
 }
 
@@ -176,8 +178,8 @@ export default function SprintBoard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 flex-1">
-        {['todo', 'in_progress', 'done'].map((status) => {
+      <div className="grid grid-cols-5 gap-3 flex-1">
+        {['todo', 'in_progress', 'testing', 'ready_for_production', 'done'].map((status) => {
           const config = statusConfig[status]
           const columnTasks = getFilteredTasks(status)
           return (

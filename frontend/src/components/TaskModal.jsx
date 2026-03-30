@@ -11,6 +11,8 @@ export default function TaskModal({ task, projectId, sprintId, members, onClose,
     priority: task?.priority || 'medium',
     due_date: task?.due_date || '',
     assignee_id: task?.assignee_id || '',
+    estimate: task?.estimate ?? '',
+    estimate_unit: task?.estimate_unit || 'hours',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -34,6 +36,8 @@ export default function TaskModal({ task, projectId, sprintId, members, onClose,
         priority: form.priority,
         due_date: form.due_date || null,
         assignee_id: form.assignee_id ? parseInt(form.assignee_id) : null,
+        estimate: form.estimate !== '' ? parseFloat(form.estimate) : null,
+        estimate_unit: form.estimate !== '' ? form.estimate_unit : null,
       }
 
       if (isEditing) {
@@ -137,6 +141,8 @@ export default function TaskModal({ task, projectId, sprintId, members, onClose,
               >
                 <option value="todo">To Do</option>
                 <option value="in_progress">In Progress</option>
+                <option value="testing">Testing</option>
+                <option value="ready_for_production">Ready for Production</option>
                 <option value="done">Done</option>
               </select>
             </div>
@@ -182,6 +188,31 @@ export default function TaskModal({ task, projectId, sprintId, members, onClose,
                     {m.full_name}
                   </option>
                 ))}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Estimate</label>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                name="estimate"
+                value={form.estimate}
+                onChange={handleChange}
+                min="0"
+                step="0.5"
+                placeholder="e.g. 3"
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <select
+                name="estimate_unit"
+                value={form.estimate_unit}
+                onChange={handleChange}
+                className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="hours">Hours</option>
+                <option value="days">Days</option>
               </select>
             </div>
           </div>

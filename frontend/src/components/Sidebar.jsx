@@ -117,6 +117,19 @@ export default function Sidebar() {
                     </Link>
                   ))}
                   <Link
+                    to={`/teams/${team.id}/backlog`}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                      isActive(`/teams/${team.id}/backlog`)
+                        ? 'bg-slate-700 text-white'
+                        : 'text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    Backlog
+                  </Link>
+                  <Link
                     to={`/teams/${team.id}/sprints`}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
                       isActive(`/teams/${team.id}/sprints`)

@@ -1,5 +1,5 @@
 from datetime import datetime, timezone, date
-from sqlalchemy import String, Text, DateTime, Date, Integer, ForeignKey, Enum
+from sqlalchemy import String, Text, DateTime, Date, Integer, Float, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
@@ -9,7 +9,14 @@ from app.database import Base
 class TaskStatus(str, enum.Enum):
     todo = "todo"
     in_progress = "in_progress"
+    testing = "testing"
+    ready_for_production = "ready_for_production"
     done = "done"
+
+
+class EstimateUnit(str, enum.Enum):
+    hours = "hours"
+    days = "days"
 
 
 class TaskPriority(str, enum.Enum):
@@ -35,6 +42,10 @@ class Task(Base):
         nullable=False,
     )
     due_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    estimate: Mapped[float | None] = mapped_column(Float, nullable=True)
+    estimate_unit: Mapped[str | None] = mapped_column(
+        Enum(EstimateUnit, name="estimateunit"), nullable=True
+    )
     assignee_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=True
     )

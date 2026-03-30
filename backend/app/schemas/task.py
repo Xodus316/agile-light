@@ -26,6 +26,8 @@ class TaskCreate(BaseModel):
     assignee_id: int | None = None
     project_id: int
     sprint_id: int | None = None
+    estimate: float | None = None
+    estimate_unit: str | None = None
 
 
 class TaskUpdate(BaseModel):
@@ -38,6 +40,9 @@ class TaskUpdate(BaseModel):
     sprint_id: int | None = None
     clear_sprint: bool = False
     clear_assignee: bool = False
+    estimate: float | None = None
+    estimate_unit: str | None = None
+    clear_estimate: bool = False
 
 
 class TaskResponse(BaseModel):
@@ -50,6 +55,8 @@ class TaskResponse(BaseModel):
     assignee_id: int | None
     project_id: int
     sprint_id: int | None
+    estimate: float | None
+    estimate_unit: str | None
     created_at: datetime
     assignee: AssigneeInfo | None = None
     project: ProjectInfo | None = None

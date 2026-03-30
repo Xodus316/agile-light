@@ -139,6 +139,8 @@ async def create_task(
         assignee_id=data.assignee_id,
         project_id=data.project_id,
         sprint_id=data.sprint_id,
+        estimate=data.estimate,
+        estimate_unit=data.estimate_unit,
     )
     db.add(task)
     await db.commit()
@@ -193,6 +195,14 @@ async def update_task(
         task.sprint_id = None
     elif data.sprint_id is not None:
         task.sprint_id = data.sprint_id
+    if data.clear_estimate:
+        task.estimate = None
+        task.estimate_unit = None
+    else:
+        if data.estimate is not None:
+            task.estimate = data.estimate
+        if data.estimate_unit is not None:
+            task.estimate_unit = data.estimate_unit
 
     await db.commit()
 

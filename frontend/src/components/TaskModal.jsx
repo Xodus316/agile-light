@@ -13,6 +13,8 @@ export default function TaskModal({ task, projectId, sprintId, members, onClose,
     assignee_id: task?.assignee_id || '',
     estimate: task?.estimate ?? '',
     estimate_unit: task?.estimate_unit || 'hours',
+    actual: task?.actual ?? '',
+    actual_unit: task?.actual_unit || 'hours',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -38,6 +40,8 @@ export default function TaskModal({ task, projectId, sprintId, members, onClose,
         assignee_id: form.assignee_id ? parseInt(form.assignee_id) : null,
         estimate: form.estimate !== '' ? parseFloat(form.estimate) : null,
         estimate_unit: form.estimate !== '' ? form.estimate_unit : null,
+        actual: form.actual !== '' ? parseFloat(form.actual) : null,
+        actual_unit: form.actual !== '' ? form.actual_unit : null,
       }
 
       if (isEditing) {
@@ -192,28 +196,54 @@ export default function TaskModal({ task, projectId, sprintId, members, onClose,
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Estimate</label>
-            <div className="flex gap-2">
-              <input
-                type="number"
-                name="estimate"
-                value={form.estimate}
-                onChange={handleChange}
-                min="0"
-                step="0.5"
-                placeholder="e.g. 3"
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <select
-                name="estimate_unit"
-                value={form.estimate_unit}
-                onChange={handleChange}
-                className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="hours">Hours</option>
-                <option value="days">Days</option>
-              </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Estimate</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  name="estimate"
+                  value={form.estimate}
+                  onChange={handleChange}
+                  min="0"
+                  step="0.5"
+                  placeholder="e.g. 3"
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <select
+                  name="estimate_unit"
+                  value={form.estimate_unit}
+                  onChange={handleChange}
+                  className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="hours">hrs</option>
+                  <option value="days">days</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Actual Time</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  name="actual"
+                  value={form.actual}
+                  onChange={handleChange}
+                  min="0"
+                  step="0.5"
+                  placeholder="e.g. 4"
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <select
+                  name="actual_unit"
+                  value={form.actual_unit}
+                  onChange={handleChange}
+                  className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="hours">hrs</option>
+                  <option value="days">days</option>
+                </select>
+              </div>
             </div>
           </div>
 

@@ -1,3 +1,5 @@
+const toHours = (val, unit) => (unit === 'days' ? val * 8 : val)
+
 const priorityConfig = {
   low: { label: 'Low', classes: 'bg-green-100 text-green-700' },
   medium: { label: 'Medium', classes: 'bg-yellow-100 text-yellow-700' },
@@ -23,6 +25,10 @@ export default function TaskCard({ task, onClick }) {
     ? `${task.estimate}${task.estimate_unit === 'hours' ? 'h' : 'd'}`
     : null
 
+  const actualLabel = task.actual != null
+    ? `${task.actual}${task.actual_unit === 'hours' ? 'h' : 'd'} actual`
+    : null
+
   return (
     <div
       onClick={() => onClick && onClick(task)}
@@ -36,7 +42,18 @@ export default function TaskCard({ task, onClick }) {
         </span>
         {estimateLabel && (
           <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-slate-100 text-slate-500">
-            {estimateLabel}
+            est {estimateLabel}
+          </span>
+        )}
+        {actualLabel && (
+          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+            task.estimate != null
+              ? (toHours(task.actual, task.actual_unit) > toHours(task.estimate, task.estimate_unit)
+                  ? 'bg-red-100 text-red-600'
+                  : 'bg-green-100 text-green-600')
+              : 'bg-slate-100 text-slate-500'
+          }`}>
+            {actualLabel}
           </span>
         )}
       </div>

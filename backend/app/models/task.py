@@ -46,6 +46,10 @@ class Task(Base):
     estimate_unit: Mapped[str | None] = mapped_column(
         Enum(EstimateUnit, name="estimateunit"), nullable=True
     )
+    actual: Mapped[float | None] = mapped_column(Float, nullable=True)
+    actual_unit: Mapped[str | None] = mapped_column(
+        Enum(EstimateUnit, name="estimateunit", create_constraint=False), nullable=True
+    )
     assignee_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=True
     )

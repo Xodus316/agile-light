@@ -126,12 +126,29 @@ export default function SprintRetrospective() {
   const done = tasks.filter((t) => t.status === 'done').length
   const pct = total === 0 ? 0 : Math.round((done / total) * 100)
 
-  // Group remaining (non-done) tasks by status
   const remaining = tasks.filter((t) => t.status !== 'done')
   const byStatus = {}
   for (const t of remaining) {
     byStatus[t.status] = (byStatus[t.status] || 0) + 1
   }
+
+  // Assignee breakdown — normalize everything to hours (1 day = 8 hrs)
+  const toHours = (val, unit) => (unit === 'days' ? val * 8 : val ?? 0)
+  const fmtHours = (h) => h % 1 === 0 ? `${h}h` : `${h.toFixed(1)}h`
+
+  const assigneeMap = {}
+  for (const t of tasks) {
+    if (!t.assignee) continue
+    const key = t.assignee.id
+    if (!assigneeMap[key]) {
+      assigneeMap[key] = { name: t.assignee.full_name, completed: 0, estimated: 0, actual: 0, hasEstimate: false, hasActual: false }
+    }
+    const row = assigneeMap[key]
+    if (t.status === 'done') row.completed++
+    if (t.estimate != null) { row.estimated += toHours(t.estimate, t.estimate_unit); row.hasEstimate = true }
+    if (t.actual != null)   { row.actual    += toHours(t.actual,   t.actual_unit);   row.hasActual = true }
+  }
+  const assigneeRows = Object.values(assigneeMap).sort((a, b) => b.completed - a.completed)
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -235,6 +252,62 @@ export default function SprintRetrospective() {
           </p>
         )}
       </div>
+
+      {/* Assignee breakdown */}
+      {assigneeRows.length > 0 && (
+        <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
+          <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wide mb-4">Team Breakdown</h2>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-xs text-slate-500 border-b border-slate-100">
+                <th className="text-left pb-2 font-medium">Assignee</th>
+                <th className="text-center pb-2 font-medium">Tasks Done</th>
+                <th className="text-center pb-2 font-medium">Estimated</th>
+                <th className="text-center pb-2 font-medium">Actual</th>
+                <th className="text-center pb-2 font-medium">Variance</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {assigneeRows.map((row) => {
+                const variance = row.hasActual && row.hasEstimate ? row.actual - row.estimated : null
+                const over = variance != null && variance > 0
+                const under = variance != null && variance < 0
+                return (
+                  <tr key={row.name}>
+                    <td className="py-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                          {row.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-medium text-slate-700">{row.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-2.5 text-center">
+                      <span className="font-semibold text-slate-800">{row.completed}</span>
+                    </td>
+                    <td className="py-2.5 text-center text-slate-500">
+                      {row.hasEstimate ? fmtHours(row.estimated) : <span className="text-slate-300">—</span>}
+                    </td>
+                    <td className="py-2.5 text-center text-slate-500">
+                      {row.hasActual ? fmtHours(row.actual) : <span className="text-slate-300">—</span>}
+                    </td>
+                    <td className="py-2.5 text-center">
+                      {variance != null ? (
+                        <span className={`font-medium ${over ? 'text-red-500' : under ? 'text-green-600' : 'text-slate-400'}`}>
+                          {over ? '+' : ''}{fmtHours(variance)}
+                        </span>
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+          <p className="text-xs text-slate-400 mt-3">Hours calculated as: 1 day = 8 hrs. Variance = actual − estimated.</p>
+        </div>
+      )}
 
       {/* Retrospective sections */}
       <div className="space-y-4 mb-6">

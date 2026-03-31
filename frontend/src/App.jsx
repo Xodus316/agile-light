@@ -10,6 +10,8 @@ import SprintBoard from './pages/SprintBoard.jsx'
 import SprintList from './pages/SprintList.jsx'
 import SprintRetrospective from './pages/SprintRetrospective.jsx'
 import TeamBacklog from './pages/TeamBacklog.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
+import AdminRoute from './components/AdminRoute.jsx'
 
 export default function App() {
   return (
@@ -32,6 +34,14 @@ export default function App() {
           <Route path="projects/:projectId" element={<ProjectBacklog />} />
           <Route path="sprints/:sprintId" element={<SprintBoard />} />
           <Route path="sprints/:sprintId/retrospective" element={<SprintRetrospective />} />
+          <Route
+            path="admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

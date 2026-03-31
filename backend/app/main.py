@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth, teams, projects, sprints, tasks
+from app.routers import auth, teams, projects, sprints, tasks, admin
 
 app = FastAPI(title="Agile API", version="1.0.0")
 
@@ -18,6 +18,7 @@ app.include_router(teams.router)
 app.include_router(projects.router)
 app.include_router(sprints.router)
 app.include_router(tasks.router)
+app.include_router(admin.router)
 
 
 @app.get("/health")

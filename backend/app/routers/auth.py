@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.database import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
+from sqlalchemy import func
 from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
 from app.core.deps import get_current_user
 from app.schemas.auth import (
@@ -28,10 +29,15 @@ async def register(data: RegisterRequest, db: AsyncSession = Depends(get_db)):
             detail="Email already registered",
         )
 
+    count_result = await db.execute(select(func.count()).select_from(User))
+    user_count = count_result.scalar()
+    role = UserRole.admin if user_count == 0 else UserRole.user
+
     user = User(
         email=data.email,
         hashed_password=hash_password(data.password),
         full_name=data.full_name,
+        role=role,
     )
     db.add(user)
     await db.commit()
@@ -48,6 +54,12 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is deactivated",
         )
 
     access_token = create_access_token({"sub": str(user.id)})
